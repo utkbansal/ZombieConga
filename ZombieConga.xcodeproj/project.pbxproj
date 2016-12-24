@@ -312,6 +312,7 @@
 				4BC1B9921E09B4AF0039A9FC /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
