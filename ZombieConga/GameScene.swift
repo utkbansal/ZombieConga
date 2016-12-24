@@ -12,6 +12,11 @@ class GameScene: SKScene {
     
     let zombie: SKSpriteNode = SKSpriteNode(imageNamed: "zombie1")
     
+    var lastUpdateTime: TimeInterval = 0
+    var dt: TimeInterval = 0
+    let zombieMovePointsPerSec: CGFloat = 480.0
+    var velocity = CGPoint.zero
+    
     override func didMove(to view: SKView) {
         
         let background: SKSpriteNode = SKSpriteNode(imageNamed: "background1")
@@ -25,8 +30,24 @@ class GameScene: SKScene {
         
     }
     
+    func moveSprite(sprite: SKSpriteNode, velocity: CGPoint) {
+        let amountToMove = CGPoint(x: velocity.x * CGFloat(dt), y: velocity.y * CGFloat(dt))
+        
+        sprite.position = CGPoint(x: sprite.position.x + amountToMove.x, y: sprite.position.y + amountToMove.y)
+    }
+    
     override func update(_ currentTime: TimeInterval) {
-        zombie.position = CGPoint(x: zombie.position.x + 8, y: zombie.position.y)
+        
+        if lastUpdateTime > 0 {
+            dt = currentTime - lastUpdateTime
+        }
+        else {
+            dt = 0
+        }
+        lastUpdateTime = currentTime
+//        print("\(dt*1000) milliseconds since last update")
+        
+        self.moveSprite(sprite: zombie, velocity: CGPoint(x: zombieMovePointsPerSec, y: 0))
     }
     
 }
