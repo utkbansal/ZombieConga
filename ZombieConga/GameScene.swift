@@ -30,10 +30,40 @@ class GameScene: SKScene {
         
     }
     
+    func moveZombieToward(location: CGPoint) {
+        let offset: CGPoint = CGPoint(x: location.x - zombie.position.x, y: location.y - zombie.position.y)
+        let length = sqrt(Double(offset.x * offset.x + offset.y * offset.y))
+        let direction = CGPoint(x: offset.x / CGFloat(length), y: offset.y / CGFloat(length))
+        velocity = CGPoint(x: direction.x * zombieMovePointsPerSec, y: direction.y * zombieMovePointsPerSec)
+        
+    }
+    
     func moveSprite(sprite: SKSpriteNode, velocity: CGPoint) {
         let amountToMove = CGPoint(x: velocity.x * CGFloat(dt), y: velocity.y * CGFloat(dt))
         
         sprite.position = CGPoint(x: sprite.position.x + amountToMove.x, y: sprite.position.y + amountToMove.y)
+    }
+    
+    func sceneTouched(touchLocation: CGPoint) {
+        moveZombieToward(location: touchLocation)
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        let touchLocation = touch.location(in: self)
+        self.sceneTouched(touchLocation: touchLocation)
+    }
+    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        guard let touch = touches.first else {
+            return
+        }
+        
+        let touchLocation = touch.location(in: self)
+        self.sceneTouched(touchLocation: touchLocation)
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -47,7 +77,7 @@ class GameScene: SKScene {
         lastUpdateTime = currentTime
 //        print("\(dt*1000) milliseconds since last update")
         
-        self.moveSprite(sprite: zombie, velocity: CGPoint(x: zombieMovePointsPerSec, y: 0))
+        self.moveSprite(sprite: zombie, velocity: velocity)
     }
     
 }
