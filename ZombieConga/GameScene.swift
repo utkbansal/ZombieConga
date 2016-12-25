@@ -10,12 +10,28 @@ import SpriteKit
 
 class GameScene: SKScene {
     
+    let playableRect: CGRect
+    
     let zombie: SKSpriteNode = SKSpriteNode(imageNamed: "zombie1")
     
     var lastUpdateTime: TimeInterval = 0
     var dt: TimeInterval = 0
     let zombieMovePointsPerSec: CGFloat = 480.0
     var velocity = CGPoint.zero
+    
+    override init(size: CGSize) {
+        let maxAspectRatio:CGFloat = 16.0/9.0 // 1
+        let playableHeight = size.width / maxAspectRatio // 2
+        let playableMargin = (size.height-playableHeight)/2.0 // 3
+        playableRect = CGRect(x: 0, y: playableMargin,
+                              width: size.width,
+                              height: playableHeight) // 4
+        super.init(size: size) // 5
+    }
+    
+    required init(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented") // 6
+    }
     
     override func didMove(to view: SKView) {
         
@@ -45,8 +61,11 @@ class GameScene: SKScene {
     }
     
     func boundsCheckZombie() {
-        let bottomLeft = CGPoint.zero
-        let topRight = CGPoint(x: size.width, y: size.height)
+        let bottomLeft = CGPoint(x: 0,
+                                 y: playableRect.minY)
+        let topRight = CGPoint(x: size.width,
+                               y: playableRect.maxY)
+        
         if zombie.position.x <= bottomLeft.x {
             zombie.position.x = bottomLeft.x
             velocity.x = -velocity.x
