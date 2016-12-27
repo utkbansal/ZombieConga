@@ -47,7 +47,6 @@ class GameScene: SKScene {
         addChild(background)
         
         let mySize = background.size
-        print("Size: \(mySize)")
         
         zombie.position = CGPoint(x: 400, y: 400)
         // zombie.setScale(2) // SKNode method
@@ -57,6 +56,8 @@ class GameScene: SKScene {
         //    // Uncomment this and the handleTap method, and comment the touchesBegan/Moved methods to test
         //    let tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("handleTap:"))
         //    view.addGestureRecognizer(tapRecognizer)
+        
+        spawnEnemy()
         
         
     }
@@ -69,7 +70,6 @@ class GameScene: SKScene {
             dt = 0
         }
         lastUpdateTime = currentTime
-        print("\(dt*1000) milliseconds since last update")
         
         if let lastTouchLocation = lastTouchLocation {
             let diff = lastTouchLocation - zombie.position
@@ -86,9 +86,35 @@ class GameScene: SKScene {
         
     }
     
+    func spawnEnemy() {
+        let enemy = SKSpriteNode(imageNamed: "enemy")
+        enemy.position = CGPoint(x: size.width + enemy.size.width/2, y:size.height/2)
+        self.addChild(enemy)
+        
+        let actionMidMove = SKAction.moveBy(
+            x: -size.width/2-enemy.size.width/2,
+            y: -playableRect.height/2 + enemy.size.height/2,
+            duration: 1.0)
+        let actionMove = SKAction.moveBy(
+            x: -size.width/2-enemy.size.width/2,
+            y: playableRect.height/2 - enemy.size.height/2,
+            duration: 1.0)
+        let wait = SKAction.wait(forDuration: 1.0)
+        let logMessage = SKAction.run {
+            print("Reached bottom")
+        }
+        let halfSequence = SKAction.sequence(
+            [actionMidMove, logMessage, wait, actionMove])
+        let sequence = SKAction.sequence([halfSequence, halfSequence.reversed()])
+        
+        let repeatAction = SKAction.repeatForever(sequence)
+        
+        enemy.run(repeatAction)
+    }
+    
     func moveSprite(_ sprite: SKSpriteNode, velocity: CGPoint) {
         let amountToMove = velocity * CGFloat(dt)
-        print("Amount to move: \(amountToMove)")
+        
         sprite.position += amountToMove
     }
     
