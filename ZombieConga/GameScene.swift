@@ -57,8 +57,7 @@ class GameScene: SKScene {
         //    let tapRecognizer = UITapGestureRecognizer(target: self, action: Selector("handleTap:"))
         //    view.addGestureRecognizer(tapRecognizer)
         
-        spawnEnemy()
-        
+        self.run(SKAction.repeatForever(SKAction.sequence([SKAction.run(spawnEnemy), SKAction.wait(forDuration: 2.0)])))
         
     }
     
@@ -88,28 +87,17 @@ class GameScene: SKScene {
     
     func spawnEnemy() {
         let enemy = SKSpriteNode(imageNamed: "enemy")
-        enemy.position = CGPoint(x: size.width + enemy.size.width/2, y:size.height/2)
-        self.addChild(enemy)
+        enemy.position = CGPoint(
+            x: size.width + enemy.size.width/2,
+            y: CGFloat.random(
+                min: playableRect.minY + enemy.size.height/2,
+                max: playableRect.maxY - enemy.size.height/2))
+        addChild(enemy)
+        let actionMove =
+            SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
+        let actionRemove = SKAction.removeFromParent()
+        enemy.run(SKAction.sequence([actionMove, actionRemove]))
         
-        let actionMidMove = SKAction.moveBy(
-            x: -size.width/2-enemy.size.width/2,
-            y: -playableRect.height/2 + enemy.size.height/2,
-            duration: 1.0)
-        let actionMove = SKAction.moveBy(
-            x: -size.width/2-enemy.size.width/2,
-            y: playableRect.height/2 - enemy.size.height/2,
-            duration: 1.0)
-        let wait = SKAction.wait(forDuration: 1.0)
-        let logMessage = SKAction.run {
-            print("Reached bottom")
-        }
-        let halfSequence = SKAction.sequence(
-            [actionMidMove, logMessage, wait, actionMove])
-        let sequence = SKAction.sequence([halfSequence, halfSequence.reversed()])
-        
-        let repeatAction = SKAction.repeatForever(sequence)
-        
-        enemy.run(repeatAction)
     }
     
     func moveSprite(_ sprite: SKSpriteNode, velocity: CGPoint) {
