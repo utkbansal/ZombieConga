@@ -20,6 +20,7 @@ class GameScene: SKScene {
     let playableRect: CGRect
     var lastTouchLocation: CGPoint?
     let zombieRotateRadiansPerSec:CGFloat = 4.0 * π
+    let zombieAnimation: SKAction
     
     override init(size: CGSize) {
         let maxAspectRatio:CGFloat = 16.0/9.0 // 1
@@ -28,11 +29,35 @@ class GameScene: SKScene {
         playableRect = CGRect(x: 0, y: playableMargin,
                               width: size.width,
                               height: playableHeight) // 4
+        
+        var textures: [SKTexture] = []
+        for i in 1...4 {
+            textures.append(SKTexture(imageNamed: "zombie\(i)"))
+        }
+        
+        textures.append(textures[2])
+        textures.append(textures[1])
+        
+        zombieAnimation = SKAction.animate(with: textures, timePerFrame: 0.1)
+        
+        
+        
         super.init(size: size) // 5
     }
     
     required init(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented") // 6
+    }
+    
+    
+    func startZombieAnimation() {
+        if zombie.action(forKey: "animation") == nil {
+            zombie.run(
+                SKAction.repeatForever(zombieAnimation),
+                withKey: "animation")
+        } }
+    func stopZombieAnimation() {
+        zombie.removeAction(forKey: "animation")
     }
     
     override func didMove(to view: SKView) {
@@ -75,6 +100,7 @@ class GameScene: SKScene {
             if (diff.length() <= zombieMovePointsPerSec * CGFloat(dt)) {
                 zombie.position = lastTouchLocation
                 velocity = CGPoint.zero
+                stopZombieAnimation()
             } else {
                 moveSprite(zombie, velocity: velocity)
                 rotateSprite(zombie, direction: velocity, rotateRadiansPerSec: zombieRotateRadiansPerSec)
@@ -110,6 +136,7 @@ class GameScene: SKScene {
         let offset = location - zombie.position
         let direction = offset.normalized()
         velocity = direction * zombieMovePointsPerSec
+        startZombieAnimation()
     }
     
     func sceneTouched(_ touchLocation:CGPoint) {
