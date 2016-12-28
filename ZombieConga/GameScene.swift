@@ -84,6 +84,9 @@ class GameScene: SKScene {
         
         self.run(SKAction.repeatForever(SKAction.sequence([SKAction.run(spawnEnemy), SKAction.wait(forDuration: 2.0)])))
         
+        
+        self.run(SKAction.repeatForever(SKAction.sequence([ SKAction.run(spawnCat), SKAction.wait(forDuration: 1.0)])))
+        
     }
     
     override func update(_ currentTime: TimeInterval) {
@@ -123,6 +126,28 @@ class GameScene: SKScene {
             SKAction.moveTo(x: -enemy.size.width/2, duration: 2.0)
         let actionRemove = SKAction.removeFromParent()
         enemy.run(SKAction.sequence([actionMove, actionRemove]))
+        
+    }
+    
+    func spawnCat() {
+        let cat = SKSpriteNode(imageNamed: "cat")
+        cat.position = CGPoint(x: CGFloat.random(min: playableRect.minX, max: playableRect.maxX),
+                               y: CGFloat.random(min: playableRect.minY, max: playableRect.maxY)
+        )
+        cat.scale(to: CGSize.zero)
+        self.addChild(cat)
+        
+        let appear = SKAction.scale(to: 1.0, duration: 0.5)
+        cat.zRotation = -π / 16.0
+        let leftWiggle = SKAction.rotate(byAngle: π/8.0, duration: 0.5)
+        let rightWiggle = leftWiggle.reversed()
+        let fullWiggle = SKAction.sequence([leftWiggle, rightWiggle])
+        let wiggleWait = SKAction.repeat(fullWiggle, count: 10)
+        let disappear = SKAction.scale(to: 0.0, duration: 0.5)
+        let removeFormParent = SKAction.removeFromParent()
+        let actions = [appear, wiggleWait, disappear, removeFormParent]
+        cat.run(SKAction.sequence(actions))
+        
         
     }
     
